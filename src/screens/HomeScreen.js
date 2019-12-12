@@ -3,9 +3,7 @@ import React, {Component, Fragment} from 'react'
 import {
   View,
   Text,
-  Button,
   StyleSheet,
-  StatusBar,
   TouchableHighlight,
   Image,
   ScrollView,
@@ -13,20 +11,66 @@ import {
   TextInput,
 } from 'react-native';
 
+import SQLite from "react-native-sqlite-2";
+
+
 class HomeScreen extends Component {
     constructor(props) {
       super(props)
+
+      const db = SQLite.openDatabase("RestaurantReserve.db", "1.0", "", 1);
+
+      db.transaction(function(txn) {
+        txn.executeSql(
+          "CREATE TABLE IF NOT EXISTS Users(user_id INTEGER PRIMARY KEY NOT NULL, name VARCHAR(30), quantity INTEGER)",
+          []
+        );
+
+        txn.executeSql(
+          "CREATE TABLE IF NOT EXISTS Tables(table_id INTEGER PRIMARY KEY NOT NULL, tablenumber VARCHAR(5), user_id INTEGER)",
+          []
+        );
+
+        txn.executeSql(
+          "CREATE TABLE IF NOT EXISTS Tokens(token_id INTEGER PRIMARY KEY NOT NULL, token VARCHAR(30), user_id INTEGER, table_id INTEGER)",
+          []
+        );
+
+        txn.executeSql("SELECT * FROM `users`", [], function(tx, res) {
+          for (let i = 0; i < res.rows.length; ++i) {
+            console.log("item:", res.rows.item(i));
+          }
+        });
+
+      })
 
       this.state = {
         modalVisible: false,
         quantity: '',
         userName: '',
       }
+
     }
 
     setModalVisible(visible) {
       this.setState({modalVisible: visible});
     }
+
+
+    saveUserDetail() {
+      const db = SQLite.openDatabase("RestaurantReserve.db", "1.0", "", 1);
+
+      db.transaction(function(txn) {
+        txn.executeSql("INSERT INTO Users (name) VALUES (:name)", ["raj"]);
+        txn.executeSql("SELECT * FROM `users`", [], function(tx, res) {
+          for (let i = 0; i < res.rows.length; ++i) {
+            console.log("item:", res.rows.item(i));
+          }
+        });
+      });
+
+    }
+
 
     render() {
       console.log("Hi there how are you mate...");
@@ -106,6 +150,14 @@ class HomeScreen extends Component {
                       this.setModalVisible(true);
                     }}>
                     <Text>Add +</Text>
+                  </TouchableHighlight>
+
+                  <TouchableHighlight
+                    style={styles.addUser}
+                    onPress={() => {
+                      this.saveUserDetail();
+                    }}>
+                    <Text>Press Me</Text>
                   </TouchableHighlight>
 
                 </ScrollView>
