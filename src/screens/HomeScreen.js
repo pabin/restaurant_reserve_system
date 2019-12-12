@@ -38,14 +38,6 @@ class HomeScreen extends Component {
           []
         );
 
-        txn.executeSql("SELECT * FROM `users`", [], function(tx, users) {
-          this.setState({allUsers: users})
-
-          for (let i = 0; i < users.rows.length; ++i) {
-            console.log("item:", users.rows.item(i));
-          }
-        });
-
       })
 
       this.state = {
@@ -54,19 +46,14 @@ class HomeScreen extends Component {
         quantity: '',
         allUsers: [],
       }
-
     }
 
     componentDidMount(){
       const db = SQLite.openDatabase("RestaurantReserve.db", "1.0", "", 1);
 
-      db.transaction(function(txn) {
-        txn.executeSql("SELECT * FROM `users`", [], function(tx, users) {
-          this.setState({allUsers: users})
-
-          for (let i = 0; i < users.rows.length; ++i) {
-            console.log("item:", users.rows.item(i));
-          }
+      db.transaction((txn) => {
+        txn.executeSql("SELECT * FROM `users`", [], (tx, users) => {
+          this.setState({'allUsers': users.rows._array})
         });
       });
     }
@@ -94,6 +81,7 @@ class HomeScreen extends Component {
     render() {
 
       const allUsers = this.state.allUsers
+      console.log('allUsers', allUsers);
       console.log("Hi there how are you mate...");
 
       return (
