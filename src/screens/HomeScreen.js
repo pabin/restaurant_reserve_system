@@ -9,6 +9,8 @@ import {
   ScrollView,
   Modal,
   TextInput,
+  KeyboardAvoidingView,
+  Dimensions,
 } from 'react-native';
 
 import SQLite from "react-native-sqlite-2";
@@ -36,9 +38,11 @@ class HomeScreen extends Component {
           []
         );
 
-        txn.executeSql("SELECT * FROM `users`", [], function(tx, res) {
-          for (let i = 0; i < res.rows.length; ++i) {
-            console.log("item:", res.rows.item(i));
+        txn.executeSql("SELECT * FROM `users`", [], function(tx, users) {
+          this.setState({allUsers: users})
+
+          for (let i = 0; i < users.rows.length; ++i) {
+            console.log("item:", users.rows.item(i));
           }
         });
 
@@ -46,11 +50,28 @@ class HomeScreen extends Component {
 
       this.state = {
         modalVisible: false,
+        name: '',
         quantity: '',
-        userName: '',
+        allUsers: [],
       }
 
     }
+
+    componentDidMount(){
+      const db = SQLite.openDatabase("RestaurantReserve.db", "1.0", "", 1);
+
+      db.transaction(function(txn) {
+        txn.executeSql("SELECT * FROM `users`", [], function(tx, users) {
+          this.setState({allUsers: users})
+
+          for (let i = 0; i < users.rows.length; ++i) {
+            console.log("item:", users.rows.item(i));
+          }
+        });
+      });
+    }
+
+
 
     setModalVisible(visible) {
       this.setState({modalVisible: visible});
@@ -58,91 +79,36 @@ class HomeScreen extends Component {
 
 
     saveUserDetail() {
+      const {name, quantity, modalVisible} = this.state
       const db = SQLite.openDatabase("RestaurantReserve.db", "1.0", "", 1);
 
       db.transaction(function(txn) {
-        txn.executeSql("INSERT INTO Users (name) VALUES (:name)", ["raj"]);
-        txn.executeSql("SELECT * FROM `users`", [], function(tx, res) {
-          for (let i = 0; i < res.rows.length; ++i) {
-            console.log("item:", res.rows.item(i));
-          }
-        });
+        txn.executeSql("INSERT INTO Users (name) VALUES (:name)", [name]);
       });
+
+      this.setModalVisible(!modalVisible)
 
     }
 
 
     render() {
+
+      const allUsers = this.state.allUsers
       console.log("Hi there how are you mate...");
+
       return (
         <Fragment>
             <View style={styles.container}>
 
-              <Modal
-                animationType="fade"
-                transparent={true}
-                visible={this.state.modalVisible}
-                onRequestClose={() => {
-                  Alert.alert('Modal has been closed.');
-                }}>
-                <View style={styles.modalContainer}>
-                  <View style={styles.input} >
-                    <Text style={styles.text}>Name</Text>
-                      <TextInput
-                          style={styles.textInput}
-                          autoCapitalize="none"
-                          onChangeText={quantity => this.setState({quantity})}
-                          autoCorrect={false}
-                          keyboardType="email-address"
-                          returnKeyType="next"
-                          multiline={true}
-                          numberOfLines={4}
-                      />
-                  </View>
-
-                  <View style={styles.input} >
-                    <Text style={styles.text}>Quantity</Text>
-                      <TextInput
-                          style={styles.textInput}
-                          autoCapitalize="none"
-                          onChangeText={userName => this.setState({userName})}
-                          autoCorrect={false}
-                          keyboardType="email-address"
-                          returnKeyType="next"
-                          multiline={true}
-                          numberOfLines={4}
-                      />
-                  </View>
-
-                  <View style={styles.input}>
-                    <TouchableHighlight
-                      style={styles.addUser}
-                      onPress={() => {
-                        this.setModalVisible(!this.state.modalVisible);
-                      }}>
-                      <Text style={styles.text}>Add</Text>
-                    </TouchableHighlight>
-                  </View>
-                </View>
-              </Modal>
-
               <View style={styles.userPanel}>
                 <ScrollView>
-                  <TouchableHighlight style={styles.user}>
-                    <Text style={styles.text}>User One</Text>
-                  </TouchableHighlight>
-
-                  <TouchableHighlight style={styles.user}>
-                    <Text style={styles.text}>User Two</Text>
-                  </TouchableHighlight>
-
-                  <TouchableHighlight style={styles.user}>
-                    <Text>User Three</Text>
-                  </TouchableHighlight>
-
-                  <TouchableHighlight style={styles.user}>
-                    <Text>User Four</Text>
-                  </TouchableHighlight>
+                  {
+                    allUsers.map((user, index) => (
+                      <TouchableHighlight style={styles.user}>
+                        <Text style={styles.text}>{user.name}</Text>
+                      </TouchableHighlight>
+                    ))
+                  }
 
                   <TouchableHighlight
                     style={styles.addUser}
@@ -152,18 +118,57 @@ class HomeScreen extends Component {
                     <Text>Add +</Text>
                   </TouchableHighlight>
 
-                  <TouchableHighlight
-                    style={styles.addUser}
-                    onPress={() => {
-                      this.saveUserDetail();
-                    }}>
-                    <Text>Press Me</Text>
-                  </TouchableHighlight>
-
                 </ScrollView>
               </View>
 
               <View style={styles.tablePanel}>
+
+                <Modal
+                  animationType="fade"
+                  transparent={true}
+                  visible={this.state.modalVisible}
+                  >
+                  <KeyboardAvoidingView style={styles.modalContainer} behavior="padding" enabled>
+                    <View style={styles.input} >
+                      <Text style={styles.text}>Name</Text>
+                        <TextInput
+                            style={styles.textInput}
+                            autoCapitalize="none"
+                            onChangeText={name => this.setState({name})}
+                            autoCorrect={false}
+                            keyboardType="email-address"
+                            returnKeyType="next"
+                            multiline={true}
+                            numberOfLines={4}
+                        />
+                    </View>
+
+                    <View style={styles.input} >
+                      <Text style={styles.text}>Quantity</Text>
+                        <TextInput
+                            style={styles.textInput}
+                            autoCapitalize="none"
+                            onChangeText={quantity => this.setState({quantity})}
+                            autoCorrect={false}
+                            keyboardType="email-address"
+                            returnKeyType="next"
+                            multiline={true}
+                            numberOfLines={4}
+                        />
+                    </View>
+
+                    <View style={styles.input}>
+                      <TouchableHighlight
+                        style={styles.addUser}
+                        onPress={() => {
+                          this.saveUserDetail();
+                        }}>
+                        <Text style={styles.text}>Add</Text>
+                      </TouchableHighlight>
+                    </View>
+                  </KeyboardAvoidingView>
+                </Modal>
+
                 <View style={styles.singleTableRow}>
                   <View style={styles.table}>
                     <Text style={styles.text}>Table 1A</Text>
@@ -276,22 +281,23 @@ const styles = StyleSheet.create({
   },
 
   modalContainer: {
-    flex: 1,
-    marginHorizontal: 350,
-    marginVertical: 250,
-    padding: 20,
+    // marginTop: Dimensions.get('window').height/3,
+    width: Dimensions.get('window').width/3,
+    height: Dimensions.get('window').height/3,
+    padding: 10,
     backgroundColor: 'white',
     borderRadius:20,
     borderWidth: 2,
     borderColor: '#000',
-    elevation: 10,
+    elevation: 5,
+    alignSelf: 'center',
   },
 
   input: {
     flex: 1,
     alignSelf: 'stretch',
     margin: 10,
-    padding: 10,
+    padding: 5,
   },
 
   textInput: {
