@@ -19,7 +19,8 @@ import {
 import SQLite from "react-native-sqlite-2";
 
 import User from '../components/User'
-
+import TableModal from '../components/TableModal'
+import UserModal from '../components/UserModal'
 
 
 class HomeScreen extends Component {
@@ -47,7 +48,8 @@ class HomeScreen extends Component {
       })
 
       this.state = {
-        modalVisible: false,
+        userModalVisible: false,
+        tableModalVisible: false,
         name: '',
         quantity: '',
         allUsers: [],
@@ -69,26 +71,6 @@ class HomeScreen extends Component {
     }
 
 
-    setModalVisible(visible) {
-      this.setState({modalVisible: !this.state.modalVisible});
-    }
-
-    saveUserDetail() {
-      console.log('hi');
-      const {name, quantity, modalVisible} = this.state
-      const db = SQLite.openDatabase("RestaurantReserve.db", "1.0", "", 1);
-
-      db.transaction(function(txn) {
-        txn.executeSql("INSERT INTO Users (name) VALUES (:name)", [name]);
-        txn.executeSql("SELECT * FROM `users`", [], (tx, users) => {
-          this.setState({'allUsers': users.rows._array})
-        });
-      });
-
-      this.setModalVisible(!modalVisible)
-    }
-
-
     render() {
       const allUsers = this.state.allUsers
       console.log('allUsers at render', allUsers);
@@ -99,7 +81,6 @@ class HomeScreen extends Component {
             <View style={styles.container}>
 
               <View style={styles.userPanel}>
-                <ScrollView>
                   {
                     allUsers.map((user, index) => (
                       <User
@@ -110,68 +91,42 @@ class HomeScreen extends Component {
                   <TouchableHighlight
                     style={styles.addUser}
                     onPress={() => {
-                      this.setModalVisible(true);
+                      this.setState({userModalVisible: !this.state.userModalVisible});
                     }}>
                       <Text style={styles.text}>Add +</Text>
                   </TouchableHighlight>
 
-                </ScrollView>
+                  <TouchableHighlight
+                    style={styles.addUser}
+                    onPress={() => {
+                      this.setState({tableModalVisible: !this.state.tableModalVisible});
+                    }}>
+                      <Text style={styles.text}>Add Table +</Text>
+                  </TouchableHighlight>
+
+
               </View>
 
               <View style={styles.tablePanel}>
-                <Modal
-                  animationType="fade"
-                  transparent={true}
-                  visible={this.state.modalVisible}
-                  >
-                  <KeyboardAvoidingView style={styles.modalContainer} behavior="padding" enabled>
-                    <View style={styles.input} >
-                      <Text style={styles.text}>Name</Text>
-                        <TextInput
-                            style={styles.textInput}
-                            autoCapitalize="none"
-                            onChangeText={name => this.setState({name})}
-                            autoCorrect={false}
-                            returnKeyType="next"
-                            multiline={true}
-                            numberOfLines={4}
-                        />
-                    </View>
+                {
+                  this.state.userModalVisible ?
+                  <UserModal visible={this.state.userModalVisible}/>
+                  :
+                  null
+                }
 
-                    <View style={styles.input} >
-                      <Text style={styles.text}>Quantity</Text>
-                        <TextInput
-                            style={styles.textInput}
-                            autoCapitalize="none"
-                            onChangeText={quantity => this.setState({quantity})}
-                            autoCorrect={false}
-                            returnKeyType="next"
-                            multiline={true}
-                            numberOfLines={4}
-                        />
-                    </View>
+                {
+                  this.state.tableModalVisible ?
+                  <TableModal visible={this.state.tableModalVisible}/>
+                  :
+                  null
+                }
 
-                    <View style={styles.input}>
-                      {this.state.name && this.state.quantity ?
-                        <Button
-                          title="Add"
-                          color="#1e824c"
-                          onPress={() => this.saveUserDetail()}
-                        />
-                        :
-                        <Button
-                          disabled={true}
-                          color="#1e824c"
-                          title="Add"
-                        />
-                      }
-                    </View>
-                  </KeyboardAvoidingView>
-                </Modal>
 
                 <ScrollView contentInsetAdjustmentBehavior="automatic">
                   <View style={styles.tablecontainer}>
                     <View style={styles.singleTableRow}>
+
                       <View style={styles.table}>
                         <Text style={styles.text}>Table 1A</Text>
                       </View>

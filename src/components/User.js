@@ -27,10 +27,10 @@ class User extends Component {
     // Initialize PanResponder with move handling
     this.panResponder = PanResponder.create({
       onStartShouldSetPanResponder: (e, gesture) => true,
-      onStartShouldSetPanResponderCapture: (e, gesture) => true,
-      onMoveShouldSetPanResponder: (e, gesture) => true,
-      onMoveShouldSetPanResponderCapture: (e, gesture) => true,
-            
+      // onStartShouldSetPanResponderCapture: (e, gesture) => true,
+      // onMoveShouldSetPanResponder: (e, gesture) => true,
+      // onMoveShouldSetPanResponderCapture: (e, gesture) => true,
+
       onPanResponderMove: Animated.event([
         null, { dx: this.state.pan.x, dy: this.state.pan.y }
       ]),
@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
     padding: 10,
     margin: 10,
     marginHorizontal: 30,
-    backgroundColor: "orange",
+    backgroundColor: "blue",
     elevation: 5,
     alignItems:'center',
     justifyContent:'center',
@@ -96,6 +96,7 @@ const styles = StyleSheet.create({
 
   text: {
     fontSize: 22,
+    color: '#FFF',
     fontWeight: 'bold',
   },
 })
