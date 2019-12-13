@@ -8,17 +8,14 @@ import {
   Image,
   ScrollView,
   Modal,
-  TextInput,
   KeyboardAvoidingView,
   Dimensions,
-  PanResponder,
-  Animated,
-  Button,
 } from 'react-native';
 
 import SQLite from "react-native-sqlite-2";
 
 import User from '../components/User'
+import Table from '../components/Table'
 import TableModal from '../components/TableModal'
 import UserModal from '../components/UserModal'
 
@@ -29,6 +26,7 @@ class HomeScreen extends Component {
 
       const db = SQLite.openDatabase("RestaurantReserve.db", "1.0", "", 1);
 
+      var allTables = []
       db.transaction(function(txn) {
         txn.executeSql(
           "CREATE TABLE IF NOT EXISTS Users(user_id INTEGER PRIMARY KEY NOT NULL, name VARCHAR(30), quantity INTEGER)",
@@ -45,6 +43,10 @@ class HomeScreen extends Component {
           []
         );
 
+        // txn.executeSql("SELECT * FROM `tables`", [], (tx, tables) => {
+        //   allTables = tables.rows._array
+        // });
+
       })
 
       this.state = {
@@ -53,11 +55,12 @@ class HomeScreen extends Component {
         name: '',
         quantity: '',
         allUsers: [],
+        allTables: [],
         showDraggable: true,
         dropAreaValues: null,
-        pan: new Animated.ValueXY(),
-        opacity: new Animated.Value(1)
       }
+
+
     }
 
     componentDidMount(){
@@ -67,19 +70,24 @@ class HomeScreen extends Component {
         txn.executeSql("SELECT * FROM `users`", [], (tx, users) => {
           this.setState({'allUsers': users.rows._array})
         });
+
+        txn.executeSql("SELECT * FROM `tables`", [], (tx, tables) => {
+          this.setState({'allTables': tables.rows._array})
+        });
       });
     }
 
 
     render() {
       const allUsers = this.state.allUsers
-      console.log('allUsers at render', allUsers);
-      console.log("Hi there how are you mate...");
+      const allTables = this.state.allTables
+
+      console.log('allTables: ', allTables);
+      console.log('allUsers: ', allUsers);
 
       return (
         <Fragment>
             <View style={styles.container}>
-
               <View style={styles.userPanel}>
                   {
                     allUsers.map((user, index) => (
@@ -93,7 +101,7 @@ class HomeScreen extends Component {
                     onPress={() => {
                       this.setState({userModalVisible: !this.state.userModalVisible});
                     }}>
-                      <Text style={styles.text}>Add +</Text>
+                      <Text style={styles.text}>Add User +</Text>
                   </TouchableHighlight>
 
                   <TouchableHighlight
@@ -103,7 +111,6 @@ class HomeScreen extends Component {
                     }}>
                       <Text style={styles.text}>Add Table +</Text>
                   </TouchableHighlight>
-
 
               </View>
 
@@ -122,51 +129,29 @@ class HomeScreen extends Component {
                   null
                 }
 
-
                 <ScrollView contentInsetAdjustmentBehavior="automatic">
                   <View style={styles.tablecontainer}>
                     <View style={styles.singleTableRow}>
 
-                      <View style={styles.table}>
-                        <Text style={styles.text}>Table 1A</Text>
-                      </View>
-
-                      <View style={styles.table}>
-                        <Text style={styles.text}>Table 1B</Text>
-                      </View>
-
-                    </View>
-
-                    <View style={styles.singleTableRow}>
-                      <View style={styles.table}>
-                        <Text style={styles.text}>Table 2A</Text>
-                      </View>
-
-                      <View style={styles.table}>
-                        <Text style={styles.text}>Table 2B</Text>
-                      </View>
-
-                    </View>
-
-                    <View style={styles.singleTableRow}>
-                      <View style={styles.table}>
-                        <Text style={styles.text}>Table 3A</Text>
-                      </View>
+                      {
+                        allTables.map((table, index) => (
+                          <Table
+                            key = {index}
+                            tableNumber={table.tablenumber}
+                          />
+                      ))}
 
                     </View>
                   </View>
                 </ScrollView>
               </View>
-
             </View>
-
         </Fragment>
       )
     }
 }
 
 export default HomeScreen
-
 
 
 const styles = StyleSheet.create({
@@ -188,16 +173,6 @@ const styles = StyleSheet.create({
     // alignItems: 'stretch',
   },
 
-  user: {
-    padding: 10,
-    margin: 10,
-    backgroundColor: "orange",
-    elevation: 5,
-    alignItems:'center',
-    justifyContent:'center',
-    borderRadius:20,
-  },
-
   addUser: {
     padding: 10,
     margin: 10,
@@ -209,21 +184,13 @@ const styles = StyleSheet.create({
     borderRadius:20,
   },
 
-  table: {
-    padding: 50,
-    margin: 20,
-    backgroundColor: "orange",
-    alignItems:'center',
-    justifyContent:'center',
-    borderRadius:10,
-  },
-
   tablecontainer: {
     flexDirection: 'row',
   },
 
   singleTableRow: {
     flex: 1,
+    flexDirection: 'row',
   },
 
   text: {
@@ -231,32 +198,4 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 
-  modalContainer: {
-    // marginTop: Dimensions.get('window').height/3,
-    width: Dimensions.get('window').width/3,
-    height: Dimensions.get('window').height/3,
-    padding: 10,
-    backgroundColor: 'white',
-    borderRadius:20,
-    borderWidth: 2,
-    borderColor: '#000',
-    elevation: 5,
-    alignSelf: 'center',
-  },
-
-  input: {
-    flex: 1,
-    alignSelf: 'stretch',
-    margin: 10,
-    padding: 5,
-  },
-
-  textInput: {
-    marginBottom: 10,
-    padding: 10,
-    color: "#fff",
-    borderWidth: 2,
-    borderColor: '#78909C',
-    color: 'black'
-  },
 })
