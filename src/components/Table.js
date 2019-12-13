@@ -91,8 +91,8 @@ const styles = StyleSheet.create({
   table: {
     padding: 20,
     paddingVertical: 50,
-    margin: 50,
-    backgroundColor: "orange",
+    margin: 40,
+    backgroundColor: "#3F7242",
     alignItems:'center',
     justifyContent:'center',
     borderRadius:10,

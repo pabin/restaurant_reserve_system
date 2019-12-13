@@ -86,8 +86,8 @@ const styles = StyleSheet.create({
   user: {
     padding: 10,
     margin: 10,
-    marginHorizontal: 30,
-    backgroundColor: "blue",
+    marginHorizontal: 20,
+    backgroundColor: "#C3302D",
     elevation: 5,
     alignItems:'center',
     justifyContent:'center',

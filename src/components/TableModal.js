@@ -59,6 +59,7 @@ class TableModal extends Component {
                   style={styles.textInput}
                   autoCapitalize="none"
                   onChangeText={tableNumber => this.setState({tableNumber})}
+                  placeholder="Eg. A1"
                   autoCorrect={false}
                   returnKeyType="next"
                   multiline={true}

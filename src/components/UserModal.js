@@ -59,8 +59,9 @@ class TableModal extends Component {
             <Text style={styles.text}>Name</Text>
               <TextInput
                   style={styles.textInput}
-                  autoCapitalize="none"
+                  autoCapitalize="characters"
                   onChangeText={name => this.setState({name})}
+                  placeholder="Eg. Edward"
                   autoCorrect={false}
                   returnKeyType="next"
                   multiline={true}
@@ -74,6 +75,7 @@ class TableModal extends Component {
                   style={styles.textInput}
                   autoCapitalize="none"
                   onChangeText={quantity => this.setState({quantity})}
+                  placeholder="Eg. 4"
                   autoCorrect={false}
                   returnKeyType="next"
                   multiline={true}

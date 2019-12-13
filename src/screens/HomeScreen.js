@@ -164,20 +164,18 @@ const styles = StyleSheet.create({
 
   userPanel: {
     flex: 1,
-    backgroundColor: 'green',
+    backgroundColor: '#DFDFDF',
   },
 
   tablePanel : {
     flex: 5,
-    // flexDirection: 'row',
-    // alignItems: 'stretch',
   },
 
   addUser: {
     padding: 10,
     margin: 10,
-    marginHorizontal: 30,
-    backgroundColor: "red",
+    marginHorizontal: 20,
+    backgroundColor: "#34AFFF",
     elevation: 5,
     alignItems:'center',
     justifyContent:'center',
@@ -191,6 +189,9 @@ const styles = StyleSheet.create({
   singleTableRow: {
     flex: 1,
     flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems:'center',
+    justifyContent:'center',
   },
 
   text: {
