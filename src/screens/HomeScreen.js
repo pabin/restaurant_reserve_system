@@ -11,9 +11,15 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Dimensions,
+  PanResponder,
+  Animated,
+  Button,
 } from 'react-native';
 
 import SQLite from "react-native-sqlite-2";
+
+import User from '../components/User'
+
 
 
 class HomeScreen extends Component {
@@ -45,6 +51,10 @@ class HomeScreen extends Component {
         name: '',
         quantity: '',
         allUsers: [],
+        showDraggable: true,
+        dropAreaValues: null,
+        pan: new Animated.ValueXY(),
+        opacity: new Animated.Value(1)
       }
     }
 
@@ -59,29 +69,29 @@ class HomeScreen extends Component {
     }
 
 
-
     setModalVisible(visible) {
-      this.setState({modalVisible: visible});
+      this.setState({modalVisible: !this.state.modalVisible});
     }
 
-
     saveUserDetail() {
+      console.log('hi');
       const {name, quantity, modalVisible} = this.state
       const db = SQLite.openDatabase("RestaurantReserve.db", "1.0", "", 1);
 
       db.transaction(function(txn) {
         txn.executeSql("INSERT INTO Users (name) VALUES (:name)", [name]);
+        txn.executeSql("SELECT * FROM `users`", [], (tx, users) => {
+          this.setState({'allUsers': users.rows._array})
+        });
       });
 
       this.setModalVisible(!modalVisible)
-
     }
 
 
     render() {
-
       const allUsers = this.state.allUsers
-      console.log('allUsers', allUsers);
+      console.log('allUsers at render', allUsers);
       console.log("Hi there how are you mate...");
 
       return (
@@ -92,25 +102,23 @@ class HomeScreen extends Component {
                 <ScrollView>
                   {
                     allUsers.map((user, index) => (
-                      <TouchableHighlight style={styles.user}>
-                        <Text style={styles.text}>{user.name}</Text>
-                      </TouchableHighlight>
-                    ))
-                  }
+                      <User
+                        key = {index}
+                        name={user.name} />
+                    ))}
 
                   <TouchableHighlight
                     style={styles.addUser}
                     onPress={() => {
                       this.setModalVisible(true);
                     }}>
-                    <Text>Add +</Text>
+                      <Text style={styles.text}>Add +</Text>
                   </TouchableHighlight>
 
                 </ScrollView>
               </View>
 
               <View style={styles.tablePanel}>
-
                 <Modal
                   animationType="fade"
                   transparent={true}
@@ -124,7 +132,6 @@ class HomeScreen extends Component {
                             autoCapitalize="none"
                             onChangeText={name => this.setState({name})}
                             autoCorrect={false}
-                            keyboardType="email-address"
                             returnKeyType="next"
                             multiline={true}
                             numberOfLines={4}
@@ -138,7 +145,6 @@ class HomeScreen extends Component {
                             autoCapitalize="none"
                             onChangeText={quantity => this.setState({quantity})}
                             autoCorrect={false}
-                            keyboardType="email-address"
                             returnKeyType="next"
                             multiline={true}
                             numberOfLines={4}
@@ -146,59 +152,55 @@ class HomeScreen extends Component {
                     </View>
 
                     <View style={styles.input}>
-                      <TouchableHighlight
-                        style={styles.addUser}
-                        onPress={() => {
-                          this.saveUserDetail();
-                        }}>
-                        <Text style={styles.text}>Add</Text>
-                      </TouchableHighlight>
+                      {this.state.name && this.state.quantity ?
+                        <Button
+                          title="Add"
+                          color="#1e824c"
+                          onPress={() => this.saveUserDetail()}
+                        />
+                        :
+                        <Button
+                          disabled={true}
+                          color="#1e824c"
+                          title="Add"
+                        />
+                      }
                     </View>
                   </KeyboardAvoidingView>
                 </Modal>
 
-                <View style={styles.singleTableRow}>
-                  <View style={styles.table}>
-                    <Text style={styles.text}>Table 1A</Text>
-                  </View>
+                <ScrollView contentInsetAdjustmentBehavior="automatic">
+                  <View style={styles.tablecontainer}>
+                    <View style={styles.singleTableRow}>
+                      <View style={styles.table}>
+                        <Text style={styles.text}>Table 1A</Text>
+                      </View>
 
-                  <View style={styles.table}>
-                    <Text style={styles.text}>Table 1B</Text>
-                  </View>
+                      <View style={styles.table}>
+                        <Text style={styles.text}>Table 1B</Text>
+                      </View>
 
-                  <View style={styles.table}>
-                    <Text>Table 1C</Text>
-                  </View>
-                </View>
+                    </View>
 
-                <View style={styles.singleTableRow}>
-                  <View style={styles.table}>
-                    <Text>Table 2A</Text>
-                  </View>
+                    <View style={styles.singleTableRow}>
+                      <View style={styles.table}>
+                        <Text style={styles.text}>Table 2A</Text>
+                      </View>
 
-                  <View style={styles.table}>
-                    <Text>Table 2B</Text>
-                  </View>
+                      <View style={styles.table}>
+                        <Text style={styles.text}>Table 2B</Text>
+                      </View>
 
-                  <View style={styles.table}>
-                    <Text>Table 2C</Text>
-                  </View>
-                </View>
+                    </View>
 
-                <View style={styles.singleTableRow}>
-                  <View style={styles.table}>
-                    <Text>Table 3A</Text>
-                  </View>
+                    <View style={styles.singleTableRow}>
+                      <View style={styles.table}>
+                        <Text style={styles.text}>Table 3A</Text>
+                      </View>
 
-                  <View style={styles.table}>
-                    <Text>Table 3B</Text>
+                    </View>
                   </View>
-
-                  <View style={styles.table}>
-                    <Text>Table 3C</Text>
-                  </View>
-                </View>
-
+                </ScrollView>
               </View>
 
             </View>
@@ -209,6 +211,7 @@ class HomeScreen extends Component {
 }
 
 export default HomeScreen
+
 
 
 const styles = StyleSheet.create({
@@ -226,8 +229,8 @@ const styles = StyleSheet.create({
 
   tablePanel : {
     flex: 5,
-    flexDirection: 'row',
-    alignItems: 'stretch',
+    // flexDirection: 'row',
+    // alignItems: 'stretch',
   },
 
   user: {
@@ -243,6 +246,7 @@ const styles = StyleSheet.create({
   addUser: {
     padding: 10,
     margin: 10,
+    marginHorizontal: 30,
     backgroundColor: "red",
     elevation: 5,
     alignItems:'center',
@@ -257,6 +261,10 @@ const styles = StyleSheet.create({
     alignItems:'center',
     justifyContent:'center',
     borderRadius:10,
+  },
+
+  tablecontainer: {
+    flexDirection: 'row',
   },
 
   singleTableRow: {
