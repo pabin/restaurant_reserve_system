@@ -30,6 +30,7 @@ class HomeScreen extends Component {
 
       var allTables = []
       db.transaction(function(txn) {
+
         txn.executeSql(
           "CREATE TABLE IF NOT EXISTS Users(user_id INTEGER PRIMARY KEY NOT NULL, name VARCHAR(30), quantity INTEGER)",
           []
@@ -101,9 +102,7 @@ class HomeScreen extends Component {
     // Gets Table component Coordinates and Width/Height
     find_table_dimesions = (layout) => {
       var upLen = this.state.userPanelLen
-
       const {x, y, width, height} = layout;
-
       var coordinates = {'x1': upLen+x, 'y1': upLen+y, 'x2': upLen+x+width, 'y2': upLen+y+height }
       this.state.tableCoordinates.push(coordinates)
       // console.log('coordinates: ', coordinates);
@@ -194,7 +193,7 @@ class HomeScreen extends Component {
                   allTables.map((table, index) => (
                     <Table
                       find_dimesions = {this.find_table_dimesions}
-                      key = {index}
+                      key = {table.table_id}
                       tableNumber={table.tablenumber}
                     />
                 ))}
