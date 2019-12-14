@@ -30,6 +30,8 @@ class HomeScreen extends Component {
 
       var allTables = []
       db.transaction(function(txn) {
+        // txn.executeSql('DROP TABLE IF EXISTS Users', []);
+        // txn.executeSql('DROP TABLE IF EXISTS Tables', []);
 
         txn.executeSql(
           "CREATE TABLE IF NOT EXISTS Users(user_id INTEGER PRIMARY KEY NOT NULL, name VARCHAR(30), quantity INTEGER)",
@@ -72,7 +74,6 @@ class HomeScreen extends Component {
 
     // Reads Users and Tables from Databse and update the state
     readTableandUser = () => {
-      console.log('tableCoordinates: ', this.state.tableCoordinates);
 
       const db = SQLite.openDatabase("RestaurantReservedb.db", "1.0", "", 1);
 
@@ -89,7 +90,6 @@ class HomeScreen extends Component {
 
     // Change the state of User Modal when this function is executed: true to false and viceversa
     setUserModalVisible = () => {
-      console.log('hi mate..');
       this.setState({userModalVisible: !this.state.userModalVisible})
     }
 
@@ -113,8 +113,6 @@ class HomeScreen extends Component {
       mX = gesture.moveX
       mY = gesture.moveY
       const tableCoordinates = this.state.tableCoordinates
-      console.log('gesture @ home: ', gesture);
-      console.log('tableCoordinates: ', this.state.tableCoordinates);
 
       tableCoordinates.map((coord, index) => {
         if ((mX > coord.x1) && (mX < coord.x2) && (mY > coord.y1) && (mY < coord.y2)) {
@@ -132,7 +130,7 @@ class HomeScreen extends Component {
     find_userpanel_len = (layout) => {
       const {x, y, width, height} = layout;
       this.setState({'userPanelLen': width})
-      // console.warn('width: ', width);
+      // console.log('width: ', width);
     }
 
     render() {

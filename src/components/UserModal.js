@@ -38,7 +38,7 @@ class TableModal extends Component {
     const db = SQLite.openDatabase("RestaurantReservedb.db", "1.0", "", 1);
 
     db.transaction(function(txn) {
-      txn.executeSql("INSERT INTO Users (name) VALUES (:name)", [name]);
+      txn.executeSql("INSERT INTO Users (name, quantity) VALUES (:name, :quantity)", [name, quantity]);
       txn.executeSql("SELECT * FROM `users`", [], (tx, users) => {
         console.log('allUsers', users.rows._array);
         // this.setState({'allUsers': users.rows._array})

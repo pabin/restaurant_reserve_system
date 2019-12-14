@@ -62,8 +62,8 @@ class User extends Component {
     mX = gesture.moveX
     mY = gesture.moveY
     const tableCoordinates = this.props.tableCoordinates
-    console.log('tableCoordinates at isdrop area: ', tableCoordinates);
-    console.log('gesture @ home: ', gesture);
+    console.log('tableCoordinates @ drop Area: ', tableCoordinates);
+    console.log('gesture @ drop Area: ', gesture);
 
     var foundRightLocation = false
     tableCoordinates.map((coord, index) => {
@@ -85,9 +85,10 @@ class User extends Component {
     return(
         <Animated.View
           {...this.panResponder.panHandlers}
-          style={[panStyle, styles.user]}>
-
-          <Text style={styles.text}>{this.props.name}</Text>
+          style={[panStyle]}>
+          <View style={styles.user}>
+            <Text style={styles.text}>{this.props.name}</Text>
+          </View>
         </Animated.View>
     )
   }
@@ -99,7 +100,7 @@ export default User
 
 const styles = StyleSheet.create({
   user: {
-    // zIndex: -100,
+    zIndex: 10,
     padding: 10,
     margin: 10,
     marginHorizontal: 20,
@@ -108,6 +109,7 @@ const styles = StyleSheet.create({
     alignItems:'center',
     justifyContent:'center',
     borderRadius:20,
+    // position: 'absolute',
   },
 
   text: {
