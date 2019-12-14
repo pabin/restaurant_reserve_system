@@ -31,7 +31,7 @@ class TableModal extends Component {
 
   saveTableDetail() {
     const {tableNumber, modalVisible} = this.state
-    const db = SQLite.openDatabase("RestaurantReserve.db", "1.0", "", 1);
+    const db = SQLite.openDatabase("RestaurantReservedb.db", "1.0", "", 1);
 
     db.transaction(function(txn) {
       txn.executeSql("INSERT INTO Tables (tablenumber) VALUES (:tablenumber)", [tableNumber]);
@@ -67,20 +67,31 @@ class TableModal extends Component {
               />
           </View>
 
-          <View style={styles.input}>
-            {this.state.tableNumber ?
-              <Button
-                title="Add"
-                color="#1e824c"
-                onPress={() => this.saveTableDetail()}
-              />
-              :
-              <Button
-                disabled={true}
-                color="#1e824c"
-                title="Add"
-              />
-            }
+          <View style={[styles.input]}>
+            <View style={styles.buttonsContainer}>
+              <View style={[styles.button, styles.marginRight]}>
+                <Button
+                  color="#C3302D"
+                  title="Close"
+                  onPress={() => this.setModalVisible(!this.state.modalVisible)}
+                />
+              </View>
+              <View style={styles.button}>
+                {this.state.tableNumber ?
+                  <Button
+                    title="Add"
+                    color="#3F7242"
+                    onPress={() => this.saveTableDetail()}
+                  />
+                  :
+                  <Button
+                    disabled={true}
+                    color="#3F7242"
+                    title="Add"
+                  />
+                }
+              </View>
+            </View>
           </View>
         </KeyboardAvoidingView>
       </Modal>
@@ -116,6 +127,18 @@ const styles = StyleSheet.create({
     alignSelf: 'stretch',
     margin: 10,
     padding: 5,
+  },
+
+  buttonsContainer: {
+    flexDirection: 'row',
+  },
+
+  button: {
+    flex: 1,
+  },
+
+  marginRight: {
+    marginRight: 10,
   },
 
   textInput: {

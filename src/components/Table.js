@@ -22,44 +22,6 @@ class Table extends Component {
       opacity: new Animated.Value(1)
     }
 
-    // Add a listener for the delta value change
-    this._val = { x:0, y:0 }
-    this.state.pan.addListener((value) => this._val = value);
-    // Initialize PanResponder with move handling
-    this.panResponder = PanResponder.create({
-      onStartShouldSetPanResponder: (e, gesture) => true,
-      // onStartShouldSetPanResponderCapture: (e, gesture) => true,
-      // onMoveShouldSetPanResponder: (e, gesture) => true,
-      // onMoveShouldSetPanResponderCapture: (e, gesture) => true,
-
-      onPanResponderMove: Animated.event([
-        null, { dx: this.state.pan.x, dy: this.state.pan.y }
-      ]),
-
-      onPanResponderRelease: (e, gesture) => {
-          if (this.isDropArea(gesture)) {
-            Animated.timing(this.state.opacity, {
-            toValue: 0,
-            duration: 1000
-          }).start(() =>
-            this.setState({
-               showDraggable: false
-            })
-          );
-        } else {
-          Animated.spring(this.state.pan, {
-            toValue: { x: 0, y: 0 },
-            friction: 5
-          }).start();
-        }
-      }
-    });
-    // adjusting delta value
-    this.state.pan.setValue({ x:0, y:0});
-  }
-
-  isDropArea(gesture) {
-    return gesture.moveY < 200;
   }
 
 

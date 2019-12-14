@@ -24,7 +24,7 @@ class HomeScreen extends Component {
     constructor(props) {
       super(props)
 
-      const db = SQLite.openDatabase("RestaurantReserve.db", "1.0", "", 1);
+      const db = SQLite.openDatabase("RestaurantReservedb.db", "1.0", "", 1);
 
       var allTables = []
       db.transaction(function(txn) {
@@ -59,12 +59,10 @@ class HomeScreen extends Component {
         showDraggable: true,
         dropAreaValues: null,
       }
-
-
     }
 
     componentDidMount(){
-      const db = SQLite.openDatabase("RestaurantReserve.db", "1.0", "", 1);
+      const db = SQLite.openDatabase("RestaurantReservedb.db", "1.0", "", 1);
 
       db.transaction((txn) => {
         txn.executeSql("SELECT * FROM `users`", [], (tx, users) => {
@@ -81,6 +79,9 @@ class HomeScreen extends Component {
     render() {
       const allUsers = this.state.allUsers
       const allTables = this.state.allTables
+
+      console.log('Show User Modal: ', this.state.userModalVisible);
+      console.log('Show Table Modal: ', this.state.tableModalVisible);
 
       console.log('allTables: ', allTables);
       console.log('allUsers: ', allUsers);
