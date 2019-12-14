@@ -20,6 +20,8 @@ import TableModal from '../components/TableModal'
 import UserModal from '../components/UserModal'
 
 
+// Main Screen with List of Users and Table wher main draging and dropping is done
+// User create modal and table create modal will be popup in this screen
 class HomeScreen extends Component {
     constructor(props) {
       super(props)
@@ -56,12 +58,16 @@ class HomeScreen extends Component {
         quantity: '',
         allUsers: [],
         allTables: [],
-        showDraggable: true,
-        dropAreaValues: null,
+        pan_x: '',
+        pan_y: '',
+        tableCoordinates: [],
+        userPanelLen: '',
       }
     }
 
     componentDidMount(){
+      console.log('tableCoordinates: ', this.state.tableCoordinates);
+
       const db = SQLite.openDatabase("RestaurantReservedb.db", "1.0", "", 1);
 
       db.transaction((txn) => {
@@ -75,76 +81,110 @@ class HomeScreen extends Component {
       });
     }
 
+    // Change the state of User Modal when this function is executed: true to false and viceversa
+    setUserModalVisible = () => {
+      console.log('hi mate..');
+      this.setState({userModalVisible: !this.state.userModalVisible})
+    }
+
+    // Change the state of Table Modal when this function is executed: true to false and viceversa
+    setTableModalVisible = () => {
+      this.setState({tableModalVisible: !this.state.tableModalVisible})
+    }
+
+
+    // Gets Table component Coordinates and Width/Height
+    find_table_dimesions = (layout) => {
+      var upLen = this.state.userPanelLen
+
+      const {x, y, width, height} = layout;
+
+      var coordinates = {'x1': upLen+x, 'y1': upLen+y, 'x2': upLen+x+width, 'y2': upLen+y+height }
+      this.state.tableCoordinates.push(coordinates)
+      // console.log('coordinates: ', coordinates);
+    }
+
+    // Gets Gesture details from panResponder when user item is released
+    get_user_coordinates = (gesture) => {
+      mX = gesture.moveX
+      mY = gesture.moveY
+      const tableCoordinates = this.state.tableCoordinates
+      console.log('gesture @ home: ', gesture);
+      console.log('tableCoordinates: ', this.state.tableCoordinates);
+
+      tableCoordinates.map((coord, index) => {
+        if ((mX > coord.x1) && (mX < coord.x2) && (mY > coord.y1) && (mY < coord.y2)) {
+          console.log('yes this is right location...')
+        } else {
+          console.log('Sorry Wrong Location...');
+        }
+      })
+
+    }
+
+    // Get Width of the UserPanel View
+    find_userpanel_len = (layout) => {
+      const {x, y, width, height} = layout;
+      this.setState({'userPanelLen': width})
+      console.warn('width: ', width);
+    }
 
     render() {
       const allUsers = this.state.allUsers
       const allTables = this.state.allTables
 
-      console.log('Show User Modal: ', this.state.userModalVisible);
-      console.log('Show Table Modal: ', this.state.tableModalVisible);
-
-      console.log('allTables: ', allTables);
-      console.log('allUsers: ', allUsers);
+      // console.log('allTables: ', allTables);
+      // console.log('allUsers: ', allUsers);
 
       return (
         <Fragment>
             <View style={styles.container}>
-              <View style={styles.userPanel}>
-                  {
-                    allUsers.map((user, index) => (
-                      <User
-                        key = {index}
-                        name={user.name} />
-                    ))}
+              <View style={styles.userPanel} onLayout={(event) => { this.find_userpanel_len(event.nativeEvent.layout) }}>
+                {
+                  allUsers.map((user, index) => (
+                    <User
+                      get_user_coordinates = {this.get_user_coordinates}
+                      key = {index}
+                      name={user.name} />
+                  ))}
 
-                  <TouchableHighlight
-                    style={styles.addUser}
-                    onPress={() => {
-                      this.setState({userModalVisible: !this.state.userModalVisible});
-                    }}>
-                      <Text style={styles.text}>Add User +</Text>
-                  </TouchableHighlight>
+                <TouchableHighlight
+                  style={styles.addUser}
+                  onPress={() => {this.setState({'userModalVisible': !this.state.userModalVisible})}}>
+                    <Text style={styles.text}>Add User +</Text>
+                </TouchableHighlight>
 
-                  <TouchableHighlight
-                    style={styles.addUser}
-                    onPress={() => {
-                      this.setState({tableModalVisible: !this.state.tableModalVisible});
-                    }}>
-                      <Text style={styles.text}>Add Table +</Text>
-                  </TouchableHighlight>
+                <TouchableHighlight
+                  style={styles.addUser}
+                  onPress={() => this.setState({'tableModalVisible': !this.state.tableModalVisible})}>
+                    <Text style={styles.text}>Add Table +</Text>
+                </TouchableHighlight>
 
               </View>
 
               <View style={styles.tablePanel}>
                 {
                   this.state.userModalVisible ?
-                  <UserModal visible={this.state.userModalVisible}/>
+                  <UserModal visible={this.state.userModalVisible} userModalVisible={this.setUserModalVisible}/>
                   :
                   null
                 }
 
                 {
                   this.state.tableModalVisible ?
-                  <TableModal visible={this.state.tableModalVisible}/>
+                  <TableModal visible={this.state.tableModalVisible} tableModalVisible={this.setTableModalVisible}/>
                   :
                   null
                 }
+                {
+                  allTables.map((table, index) => (
+                    <Table
+                      find_dimesions = {this.find_table_dimesions}
+                      key = {index}
+                      tableNumber={table.tablenumber}
+                    />
+                ))}
 
-                <ScrollView contentInsetAdjustmentBehavior="automatic">
-                  <View style={styles.tablecontainer}>
-                    <View style={styles.singleTableRow}>
-
-                      {
-                        allTables.map((table, index) => (
-                          <Table
-                            key = {index}
-                            tableNumber={table.tablenumber}
-                          />
-                      ))}
-
-                    </View>
-                  </View>
-                </ScrollView>
               </View>
             </View>
         </Fragment>
@@ -166,10 +206,16 @@ const styles = StyleSheet.create({
   userPanel: {
     flex: 1,
     backgroundColor: '#DFDFDF',
+    zIndex: 100,
   },
 
-  tablePanel : {
+  tablePanel: {
     flex: 5,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    // alignItems:'center',
+    justifyContent:'center',
+    zIndex: -100,
   },
 
   addUser: {
@@ -181,18 +227,6 @@ const styles = StyleSheet.create({
     alignItems:'center',
     justifyContent:'center',
     borderRadius:20,
-  },
-
-  tablecontainer: {
-    flexDirection: 'row',
-  },
-
-  singleTableRow: {
-    flex: 1,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignItems:'center',
-    justifyContent:'center',
   },
 
   text: {

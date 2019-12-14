@@ -26,12 +26,14 @@ class TableModal extends Component {
     }
   }
 
+  // Converts True to False and ViceVersa for State of Modal Visibility
   setModalVisible(visible) {
     this.setState({modalVisible: visible});
+    this.props.userModalVisible()
   }
 
+  // Saves the Username and Quantity from userModal to database
   saveUserDetail() {
-    console.log('hi');
     const {name, quantity, modalVisible} = this.state
     const db = SQLite.openDatabase("RestaurantReservedb.db", "1.0", "", 1);
 

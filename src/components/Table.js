@@ -31,7 +31,7 @@ class Table extends Component {
         }
 
     return(
-      <View style={styles.table}>
+      <View style={styles.table} onLayout={(event) => { this.props.find_dimesions(event.nativeEvent.layout) }}>
         <Text style={styles.text}>Table {this.props.tableNumber}</Text>
       </View>
 
@@ -51,6 +51,7 @@ const styles = StyleSheet.create({
   },
 
   table: {
+    // zIndex: -1,
     padding: 20,
     paddingVertical: 50,
     margin: 40,

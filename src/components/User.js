@@ -15,10 +15,8 @@ class User extends Component {
     super()
 
     this.state = {
-      showDraggable: true,
-      dropAreaValues: null,
       pan: new Animated.ValueXY(),
-      opacity: new Animated.Value(1)
+      opacity: new Animated.Value(1),
     }
 
     // Add a listener for the delta value change
@@ -27,9 +25,9 @@ class User extends Component {
     // Initialize PanResponder with move handling
     this.panResponder = PanResponder.create({
       onStartShouldSetPanResponder: (e, gesture) => true,
-      // onStartShouldSetPanResponderCapture: (e, gesture) => true,
-      // onMoveShouldSetPanResponder: (e, gesture) => true,
-      // onMoveShouldSetPanResponderCapture: (e, gesture) => true,
+      onStartShouldSetPanResponderCapture: (e, gesture) => true,
+      onMoveShouldSetPanResponder: (e, gesture) => true,
+      onMoveShouldSetPanResponderCapture: (e, gesture) => true,
 
       onPanResponderMove: Animated.event([
         null, { dx: this.state.pan.x, dy: this.state.pan.y }
@@ -51,6 +49,8 @@ class User extends Component {
             friction: 5
           }).start();
         }
+
+        this.props.get_user_coordinates(gesture)
       }
     });
     // adjusting delta value
@@ -68,12 +68,12 @@ class User extends Component {
         }
 
     return(
-      <Animated.View
-        {...this.panResponder.panHandlers}
-        style={[panStyle, styles.user]}>
+        <Animated.View
+          {...this.panResponder.panHandlers}
+          style={[panStyle, styles.user]}>
 
-        <Text style={styles.text}>{this.props.name}</Text>
-      </Animated.View>
+          <Text style={styles.text}>{this.props.name}</Text>
+        </Animated.View>
     )
   }
 
@@ -84,6 +84,7 @@ export default User
 
 const styles = StyleSheet.create({
   user: {
+    // zIndex: -100,
     padding: 10,
     margin: 10,
     marginHorizontal: 20,
