@@ -17,6 +17,8 @@ class User extends Component {
     this.state = {
       pan: new Animated.ValueXY(),
       opacity: new Animated.Value(1),
+      userItemLength: '',
+      userItemHeight: '',
     }
 
     // Add a listener for the delta value change
@@ -36,7 +38,7 @@ class User extends Component {
       onPanResponderRelease: (e, gesture) => {
           // var isDropArea = this.props.get_user_coordinates(gesture)
           // console.log('isDropArea @ user', isDropArea);
-          if (this.isDropArea(gesture)) {
+          if (this.isDropArea2(gesture)) {
             Animated.timing(this.state.opacity, {
             toValue: 0,
             duration: 1000
@@ -77,6 +79,45 @@ class User extends Component {
     return foundRightLocation
   }
 
+
+  isDropArea2 = (gesture) => {
+    console.log('this.state.userItemLength: ', this.state.userItemLength);
+    var mX = gesture.moveX
+    var mY = gesture.moveY
+    var ox2 = mX
+    var ox1 = mX - this.state.userItemLength
+    var oy1 = mY - (this.state.userItemHeight)/2
+    var oy2 = mY + (this.state.userItemHeight)/2
+
+    console.log('ox1: ', ox1);
+    console.log('ox2: ', ox2);
+    console.log('oy1: ', oy1);
+    console.log('oy2: ', oy2);
+
+    const tableCoordinates = this.props.tableCoordinates
+    console.info('tableCoordinates @ drop Area: ', tableCoordinates);
+    console.info('gesture @ drop Area: ', gesture);
+
+    var foundRightLocation = false
+    tableCoordinates.map((coord, index) => {
+      if ((ox1 > coord.x1) && (ox2 < coord.x2) && (oy1 > coord.y1) && (oy2 < coord.y2)) {
+        console.log('yes this is right location...')
+        foundRightLocation =  true
+      } else {
+        console.log('Sorry Wrong Location...');
+      }
+    })
+    return foundRightLocation
+  }
+
+  // Get Width of the UserPanel View
+  get_dimensions = (layout) => {
+    console.log('layout useritem: ', layout);
+    const {x, y, width, height} = layout;
+    this.setState({'userItemLength': width, 'userItemHeight': height})
+  }
+
+
   render() {
     const panStyle = {
           transform: this.state.pan.getTranslateTransform()
@@ -85,10 +126,9 @@ class User extends Component {
     return(
         <Animated.View
           {...this.panResponder.panHandlers}
-          style={[panStyle]}>
-          <View style={styles.user}>
+          onLayout={(event) => { this.get_dimensions(event.nativeEvent.layout) }}
+          style={[panStyle, styles.user]}>
             <Text style={styles.text}>{this.props.name}</Text>
-          </View>
         </Animated.View>
     )
   }
