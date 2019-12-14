@@ -34,6 +34,8 @@ class User extends Component {
       ]),
 
       onPanResponderRelease: (e, gesture) => {
+          // var isDropArea = this.props.get_user_coordinates(gesture)
+          // console.log('isDropArea @ user', isDropArea);
           if (this.isDropArea(gesture)) {
             Animated.timing(this.state.opacity, {
             toValue: 0,
@@ -50,17 +52,30 @@ class User extends Component {
           }).start();
         }
 
-        this.props.get_user_coordinates(gesture)
       }
     });
     // adjusting delta value
     this.state.pan.setValue({ x:0, y:0});
   }
 
-  isDropArea(gesture) {
-    return gesture.moveY < 200;
-  }
+  isDropArea = (gesture) => {
+    mX = gesture.moveX
+    mY = gesture.moveY
+    const tableCoordinates = this.props.tableCoordinates
+    console.log('tableCoordinates at isdrop area: ', tableCoordinates);
+    console.log('gesture @ home: ', gesture);
 
+    var foundRightLocation = false
+    tableCoordinates.map((coord, index) => {
+      if ((mX > coord.x1) && (mX < coord.x2) && (mY > coord.y1) && (mY < coord.y2)) {
+        console.log('yes this is right location...')
+        foundRightLocation =  true
+      } else {
+        console.log('Sorry Wrong Location...');
+      }
+    })
+    return foundRightLocation
+  }
 
   render() {
     const panStyle = {

@@ -66,6 +66,11 @@ class HomeScreen extends Component {
     }
 
     componentDidMount(){
+      this.readTableandUser()
+    }
+
+    // Reads Users and Tables from Databse and update the state
+    readTableandUser = () => {
       console.log('tableCoordinates: ', this.state.tableCoordinates);
 
       const db = SQLite.openDatabase("RestaurantReservedb.db", "1.0", "", 1);
@@ -115,8 +120,10 @@ class HomeScreen extends Component {
       tableCoordinates.map((coord, index) => {
         if ((mX > coord.x1) && (mX < coord.x2) && (mY > coord.y1) && (mY < coord.y2)) {
           console.log('yes this is right location...')
+          return true
         } else {
           console.log('Sorry Wrong Location...');
+          return false
         }
       })
 
@@ -126,7 +133,7 @@ class HomeScreen extends Component {
     find_userpanel_len = (layout) => {
       const {x, y, width, height} = layout;
       this.setState({'userPanelLen': width})
-      console.warn('width: ', width);
+      // console.warn('width: ', width);
     }
 
     render() {
@@ -143,6 +150,7 @@ class HomeScreen extends Component {
                 {
                   allUsers.map((user, index) => (
                     <User
+                      tableCoordinates = {this.state.tableCoordinates}
                       get_user_coordinates = {this.get_user_coordinates}
                       key = {index}
                       name={user.name} />
@@ -165,14 +173,20 @@ class HomeScreen extends Component {
               <View style={styles.tablePanel}>
                 {
                   this.state.userModalVisible ?
-                  <UserModal visible={this.state.userModalVisible} userModalVisible={this.setUserModalVisible}/>
+                  <UserModal
+                    visible={this.state.userModalVisible}
+                    readTableandUser = {this.readTableandUser}
+                    userModalVisible={this.setUserModalVisible}/>
                   :
                   null
                 }
 
                 {
                   this.state.tableModalVisible ?
-                  <TableModal visible={this.state.tableModalVisible} tableModalVisible={this.setTableModalVisible}/>
+                  <TableModal
+                    visible={this.state.tableModalVisible}
+                    readTableandUser = {this.readTableandUser}
+                    tableModalVisible={this.setTableModalVisible}/>
                   :
                   null
                 }

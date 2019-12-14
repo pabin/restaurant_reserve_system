@@ -46,6 +46,7 @@ class TableModal extends Component {
     });
 
     this.setModalVisible(!modalVisible)
+    this.props.readTableandUser()
   }
 
 
