@@ -62,8 +62,8 @@ class User extends Component {
     mX = gesture.moveX
     mY = gesture.moveY
     const tableCoordinates = this.props.tableCoordinates
-    console.log('tableCoordinates @ drop Area: ', tableCoordinates);
-    console.log('gesture @ drop Area: ', gesture);
+    console.info('tableCoordinates @ drop Area: ', tableCoordinates);
+    console.info('gesture @ drop Area: ', gesture);
 
     var foundRightLocation = false
     tableCoordinates.map((coord, index) => {

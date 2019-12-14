@@ -70,6 +70,7 @@ class HomeScreen extends Component {
 
     componentDidMount(){
       this.readTableandUser()
+      console.info('Dimensions: ', Dimensions.get('window'));
     }
 
     // Reads Users and Tables from Databse and update the state
@@ -101,9 +102,8 @@ class HomeScreen extends Component {
 
     // Gets Table component Coordinates and Width/Height
     find_table_dimesions = (layout) => {
-      var upLen = this.state.userPanelLen
       const {x, y, width, height} = layout;
-      var coordinates = {'x1': upLen+x, 'y1': upLen+y, 'x2': upLen+x+width, 'y2': upLen+y+height }
+      var coordinates = {'x1': x, 'y1': y, 'x2': x+width, 'y2': y+height }
       this.state.tableCoordinates.push(coordinates)
       // console.log('coordinates: ', coordinates);
     }
@@ -128,9 +128,11 @@ class HomeScreen extends Component {
 
     // Get Width of the UserPanel View
     find_userpanel_len = (layout) => {
+      console.log('Layout: ', layout);
+
       const {x, y, width, height} = layout;
       this.setState({'userPanelLen': width})
-      // console.log('width: ', width);
+      console.log('width: ', width);
     }
 
     render() {
@@ -143,31 +145,7 @@ class HomeScreen extends Component {
       return (
         <Fragment>
             <View style={styles.container}>
-              <View style={styles.userPanel} onLayout={(event) => { this.find_userpanel_len(event.nativeEvent.layout) }}>
-                {
-                  allUsers.map((user, index) => (
-                    <User
-                      tableCoordinates = {this.state.tableCoordinates}
-                      get_user_coordinates = {this.get_user_coordinates}
-                      key = {index}
-                      name={user.name} />
-                  ))}
-
-                <TouchableHighlight
-                  style={styles.addUser}
-                  onPress={() => {this.setState({'userModalVisible': !this.state.userModalVisible})}}>
-                    <Text style={styles.text}>Add User +</Text>
-                </TouchableHighlight>
-
-                <TouchableHighlight
-                  style={styles.addUser}
-                  onPress={() => this.setState({'tableModalVisible': !this.state.tableModalVisible})}>
-                    <Text style={styles.text}>Add Table +</Text>
-                </TouchableHighlight>
-
-              </View>
-
-              <View style={styles.tablePanel}>
+              <View style={styles.tablePanel} onLayout={(event) => { this.find_userpanel_len(event.nativeEvent.layout) }}>
                 {
                   this.state.userModalVisible ?
                   <UserModal
@@ -195,8 +173,31 @@ class HomeScreen extends Component {
                       tableNumber={table.tablenumber}
                     />
                 ))}
-
               </View>
+
+              <View style={styles.userPanel} onLayout={(event) => { this.find_userpanel_len(event.nativeEvent.layout) }}>
+                {
+                  allUsers.map((user, index) => (
+                    <User
+                      tableCoordinates = {this.state.tableCoordinates}
+                      get_user_coordinates = {this.get_user_coordinates}
+                      key = {index}
+                      name={user.name} />
+                  ))}
+
+                <TouchableHighlight
+                  style={styles.addUser}
+                  onPress={() => {this.setState({'userModalVisible': !this.state.userModalVisible})}}>
+                    <Text style={styles.text}>Add User +</Text>
+                </TouchableHighlight>
+
+                <TouchableHighlight
+                  style={styles.addUser}
+                  onPress={() => this.setState({'tableModalVisible': !this.state.tableModalVisible})}>
+                    <Text style={styles.text}>Add Table +</Text>
+                </TouchableHighlight>
+              </View>
+
             </View>
         </Fragment>
       )
@@ -210,23 +211,21 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
 
   userPanel: {
     flex: 1,
     backgroundColor: '#DFDFDF',
-    zIndex: 100,
+    // alignSelf: 'center',
+    justifyContent: 'center',
+    alignSelf: 'stretch',
   },
 
   tablePanel: {
     flex: 5,
     flexDirection: 'row',
     flexWrap: 'wrap',
-    // alignItems:'center',
     justifyContent:'center',
-    zIndex: -100,
     // backgroundColor: '#AFAFAF',
   },
 
