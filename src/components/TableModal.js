@@ -14,7 +14,6 @@ import {
 import SQLite from "react-native-sqlite-2";
 
 
-
 class TableModal extends Component {
   constructor(props) {
     super()
@@ -37,10 +36,12 @@ class TableModal extends Component {
     const db = SQLite.openDatabase("RestaurantReservedb.db", "1.0", "", 1);
 
     db.transaction(function(txn) {
+
+      // Creates Table with given table name
       txn.executeSql("INSERT INTO Tables (tablenumber) VALUES (:tablenumber)", [tableNumber]);
+
       txn.executeSql("SELECT * FROM `tables`", [], (tx, tables) => {
-        console.log('allTables', tables.rows._array);
-        // this.setState({'allTables': tables.rows._array})
+        console.log('allTables: ', tables.rows._array);
       });
     });
 

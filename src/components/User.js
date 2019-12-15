@@ -36,17 +36,11 @@ class User extends Component {
       ]),
 
       onPanResponderRelease: (e, gesture) => {
-          // var isDropArea = this.props.get_user_coordinates(gesture)
-          // console.log('isDropArea @ user', isDropArea);
-          if (this.isDropArea2(gesture)) {
+          if (this.isDropArea(gesture)) {
             Animated.timing(this.state.opacity, {
             toValue: 0,
             duration: 1000
-          }).start(() =>
-            this.setState({
-               showDraggable: false
-            })
-          );
+          }).start();
         } else {
           Animated.spring(this.state.pan, {
             toValue: { x: 0, y: 0 },
@@ -60,34 +54,18 @@ class User extends Component {
     this.state.pan.setValue({ x:0, y:0});
   }
 
+
+  // Checks if the Gesture Coordinates are with in the Table Coordinates
   isDropArea = (gesture) => {
-    mX = gesture.moveX
-    mY = gesture.moveY
-    const tableCoordinates = this.props.tableCoordinates
-    console.info('tableCoordinates @ drop Area: ', tableCoordinates);
-    console.info('gesture @ drop Area: ', gesture);
+    const {userItemLength, userItemHeight} = this.state
 
-    var foundRightLocation = false
-    tableCoordinates.map((coord, index) => {
-      if ((mX > coord.x1) && (mX < coord.x2) && (mY > coord.y1) && (mY < coord.y2)) {
-        console.log('yes this is right location...')
-        foundRightLocation =  true
-      } else {
-        console.log('Sorry Wrong Location...');
-      }
-    })
-    return foundRightLocation
-  }
-
-
-  isDropArea2 = (gesture) => {
-    console.log('this.state.userItemLength: ', this.state.userItemLength);
+    // Update on these formulas is required based on Gesture Location on UserItem
     var mX = gesture.moveX
     var mY = gesture.moveY
     var ox2 = mX
-    var ox1 = mX - this.state.userItemLength
-    var oy1 = mY - (this.state.userItemHeight)/2
-    var oy2 = mY + (this.state.userItemHeight)/2
+    var ox1 = mX - userItemLength
+    var oy1 = mY - (userItemHeight)/2
+    var oy2 = mY + (userItemHeight)/2
 
     console.log('ox1: ', ox1);
     console.log('ox2: ', ox2);
@@ -101,19 +79,19 @@ class User extends Component {
     var foundRightLocation = false
     tableCoordinates.map((coord, index) => {
       if ((ox1 > coord.x1) && (ox2 < coord.x2) && (oy1 > coord.y1) && (oy2 < coord.y2)) {
-        console.log('yes this is right location...')
+        console.log('Yes, this is right location...')
         foundRightLocation =  true
       } else {
-        console.log('Sorry Wrong Location...');
+        console.log('Sorry, Wrong Location...');
       }
     })
     return foundRightLocation
   }
 
-  // Get Width of the UserPanel View
+  // Get Width of the UserPanel View, Just for Coordinates Calculations
   get_dimensions = (layout) => {
-    console.log('layout useritem: ', layout);
-    const {x, y, width, height} = layout;
+    console.log('Useritem Layout :', layout);
+    const {width, height} = layout;
     this.setState({'userItemLength': width, 'userItemHeight': height})
   }
 
@@ -149,7 +127,6 @@ const styles = StyleSheet.create({
     alignItems:'center',
     justifyContent:'center',
     borderRadius:20,
-    // position: 'absolute',
   },
 
   text: {
