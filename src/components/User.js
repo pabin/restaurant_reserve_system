@@ -6,7 +6,6 @@ import {
   PanResponder,
   Animated,
   StyleSheet,
-  TouchableNativeFeedback,
 } from 'react-native'
 
 

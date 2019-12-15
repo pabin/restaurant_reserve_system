@@ -7,8 +7,6 @@ import {
   TouchableHighlight,
   Image,
   ScrollView,
-  Modal,
-  KeyboardAvoidingView,
   Dimensions,
 } from 'react-native';
 

@@ -3,10 +3,7 @@ import React, {Component, Fragment} from 'react'
 import {
   View,
   Text,
-  PanResponder,
-  Animated,
   StyleSheet,
-  TouchableNativeFeedback,
   Dimensions
 } from 'react-native'
 
